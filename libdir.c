@@ -10,7 +10,7 @@
 /* WARNING: KLUDGE!  */
 /*
  * this struct is not publically defined (its in g_canvas.c) so I need to
- * include this here.  Its from Pd 0.41-test03 2006-11-19. */
+ * include this here.  Its from Pd 0.47-0. */
 struct _canvasenvironment
 {
     t_symbol *ce_dir;      /* directory patch lives in */
@@ -42,6 +42,10 @@ static char *version =
  * open_via_path() instead of writing a new function.  The grand plan is
  * to have one directory hold the objects, help files, manuals,
  * etc. making it a self-contained library. <hans@at.or.at>
+ */
+/*
+ * TODO
+ * - get 'declare' messages from the meta-file, and send them to the current canvas
  */
 static void libdir_get_fullname(char*dest, size_t size, const char*classname) {
   snprintf(dest, size-1, "%s/%s-meta", classname, classname);
