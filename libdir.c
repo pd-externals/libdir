@@ -47,7 +47,6 @@ static char *version =
 static int libdir_loader(t_canvas *canvas, char *classname)
 {
     int fd = -1;
-    char helppathname[FILENAME_MAX];
     char fullclassname[FILENAME_MAX], dirbuf[FILENAME_MAX];
     char *nameptr;
     t_canvasenvironment *canvasenvironment;
@@ -85,11 +84,16 @@ static int libdir_loader(t_canvas *canvas, char *classname)
         }
         sys_close(fd);
         sys_searchpath = namelist_append(sys_searchpath, dirbuf, 0);
-        strncpy(helppathname, sys_libdir->s_name, FILENAME_MAX-30);
-        helppathname[FILENAME_MAX-30] = 0;
-        strcat(helppathname, "/doc/5.reference/");
-        strcat(helppathname, classname);
-        sys_helppath = namelist_append(sys_helppath, helppathname, 0);
+#if 0
+        if(0) {
+          char helppathname[FILENAME_MAX];
+          strncpy(helppathname, sys_libdir->s_name, FILENAME_MAX-30);
+          helppathname[FILENAME_MAX-30] = 0;
+          strcat(helppathname, "/doc/5.reference/");
+          strcat(helppathname, classname);
+          sys_helppath = namelist_append(sys_helppath, helppathname, 0);
+        }
+#endif
         logpost(NULL, 3, "libdir_loader: added '%s' to the global objectclass path", 
                 classname);
 //        post("\tThis is deprecated behavior.");
