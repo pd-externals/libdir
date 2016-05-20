@@ -77,41 +77,31 @@ static int libdir_loader_legacy(t_canvas *canvas, char *classname)
     /* if this is being called from a canvas, then add the library path to the
      * canvas-local path */
     if(canvas)
-    {
-        /* setting the canvas to NULL causes it to ignore any canvas-local path */
-        if ((fd = canvas_open(NULL, fullclassname, ".pd",
-                              dirbuf, &nameptr, FILENAME_MAX, 0)) < 0)
-        {
-            return (0);
-        }
-        sys_close(fd);
-        if(libdir_add_to_path(dirbuf, canvas))
-          logpost(NULL, 3, "libdir_loader: added '%s' to the canvas-local objectclass path",
-                  classname);
-    }
+      /* setting the canvas to NULL causes it to ignore any canvas-local path */
+      fd = canvas_open(NULL, fullclassname, ".pd",
+		       dirbuf, &nameptr, FILENAME_MAX, 0);
     else
+      fd = open_via_path(".", fullclassname, ".pd",
+			 dirbuf, &nameptr, FILENAME_MAX, 0);
+    if(fd < 0)
     {
-        if ((fd = open_via_path(".", fullclassname, ".pd",
-                                dirbuf, &nameptr, FILENAME_MAX, 0)) < 0)
-        {
-            return (0);
-        }
-        sys_close(fd);
-#if 0
-        if(0) {
-          char helppathname[FILENAME_MAX];
-          strncpy(helppathname, sys_libdir->s_name, FILENAME_MAX-30);
-          helppathname[FILENAME_MAX-30] = 0;
-          strcat(helppathname, "/doc/5.reference/");
-          strcat(helppathname, classname);
-          sys_helppath = namelist_append(sys_helppath, helppathname, 0);
-        }
-#endif
-        if(libdir_add_to_path(dirbuf, 0))
-          logpost(NULL, 3, "libdir_loader: added '%s' to the global objectclass path",
-                  classname);
-//        post("\tThis is deprecated behavior.");
+      return (0);
     }
+    sys_close(fd);
+#if 0
+    if(!canvas) {
+      char helppathname[FILENAME_MAX];
+      strncpy(helppathname, sys_libdir->s_name, FILENAME_MAX-30);
+      helppathname[FILENAME_MAX-30] = 0;
+      strcat(helppathname, "/doc/5.reference/");
+      strcat(helppathname, classname);
+      sys_helppath = namelist_append(sys_helppath, helppathname, 0);
+    }
+#endif
+    if(libdir_add_to_path(dirbuf, canvas))
+      logpost(NULL, 3, "libdir_loader: added '%s' to the %s objectclass path",
+	      classname, canvas?"canvas-local":"global");
+
     /* post("libdir_loader loaded fullclassname: '%s'\n", fullclassname); */
     logpost(NULL, 14, "Loaded libdir '%s' from '%s'", classname, dirbuf);
 
