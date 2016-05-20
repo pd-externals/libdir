@@ -63,7 +63,7 @@ static int libdir_loader(t_canvas *canvas, char *classname)
         {
             return (0);
         }
-        close(fd);
+        sys_close(fd);
         if(sys_isabsolutepath(dirbuf)) // only include actual full paths
             canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
                                                          dirbuf, 0);
@@ -77,7 +77,7 @@ static int libdir_loader(t_canvas *canvas, char *classname)
         {
             return (0);
         }
-        close(fd);
+        sys_close(fd);
         sys_searchpath = namelist_append(sys_searchpath, dirbuf, 0);
         strncpy(helppathname, sys_libdir->s_name, FILENAME_MAX-30);
         helppathname[FILENAME_MAX-30] = 0;
