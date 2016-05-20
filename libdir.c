@@ -114,6 +114,37 @@ static int libdir_loader(t_canvas *canvas, char *classname)
     return (1);
 }
 
+static int libdir_loader_pathwise(t_canvas *canvas, const char *classname, const char*path)
+{
+    int fd = -1;
+    char fullclassname[FILENAME_MAX], dirbuf[FILENAME_MAX];
+    char *nameptr;
+
+    if(!path) {
+      /* we already tried all paths, so skip this */
+      return 0;
+    }
+
+    /* look for meta file (classname)/(classname)-meta.pd */
+    libdir_get_fullname(fullclassname, FILENAME_MAX, classname);
+
+    if ((fd = sys_trytoopenone(path, fullclassname, ".pd",
+			       dirbuf, &nameptr, FILENAME_MAX, 0)) < 0) {
+      return 0;
+    }
+    sys_close(fd);
+    post("libdir:canvas=%p", canvas);
+    if(libdir_add_to_path(dirbuf, canvas))
+      logpost(NULL, 3, "libdir_loader: added '%s' to the %s objectclass path",
+	      classname, canvas?"canvas-local":"global");
+
+    /* post("libdir_loader loaded fullclassname: '%s'\n", fullclassname); */
+    logpost(NULL, 14, "Loaded libdir '%s' from '%s'", classname, dirbuf);
+
+    return (1);
+}
+
+
 void libdir_setup(void)
 {
 /* relies on t.grill's loader functionality, fully added in 0.40 */
