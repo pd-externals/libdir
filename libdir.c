@@ -47,13 +47,25 @@ static void libdir_get_fullname(char*dest, size_t size, const char*classname) {
   snprintf(dest, size-1, "%s/%s-meta", classname, classname);
   dest[size-1]=0;
 }
+static int libdir_add_to_path(const char*dirbuf, t_canvas*canvas) {
+  if(sys_isabsolutepath(dirbuf)) { // only include actual full paths
+    if (canvas) {
+      t_canvasenvironment *canvasenvironment = canvas_getenv(canvas);
+      canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path,
+						 dirbuf, 0);
+    } else {
+        sys_searchpath = namelist_append(sys_searchpath, dirbuf, 0);
+    }
+    return 1;
+  }
+  return 0;
+}
 
 static int libdir_loader(t_canvas *canvas, char *classname)
 {
     int fd = -1;
     char fullclassname[FILENAME_MAX], dirbuf[FILENAME_MAX];
     char *nameptr;
-    t_canvasenvironment *canvasenvironment;
 
 /* look for meta file (classname)/(classname)-meta.pd */
     libdir_get_fullname(fullclassname, FILENAME_MAX, classname);
@@ -62,7 +74,6 @@ static int libdir_loader(t_canvas *canvas, char *classname)
      * canvas-local path */
     if(canvas)
     {
-        canvasenvironment = canvas_getenv(canvas);
         /* setting the canvas to NULL causes it to ignore any canvas-local path */
         if ((fd = canvas_open(NULL, fullclassname, ".pd",
                               dirbuf, &nameptr, FILENAME_MAX, 0)) < 0)
@@ -70,11 +81,9 @@ static int libdir_loader(t_canvas *canvas, char *classname)
             return (0);
         }
         sys_close(fd);
-        if(sys_isabsolutepath(dirbuf)) // only include actual full paths
-            canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path, 
-                                                         dirbuf, 0);
-        logpost(NULL, 3, "libdir_loader: added '%s' to the canvas-local objectclass path",
-                classname);
+        if(libdir_add_to_path(dirbuf, canvas))
+          logpost(NULL, 3, "libdir_loader: added '%s' to the canvas-local objectclass path",
+                  classname);
     }
     else
     {
@@ -84,7 +93,6 @@ static int libdir_loader(t_canvas *canvas, char *classname)
             return (0);
         }
         sys_close(fd);
-        sys_searchpath = namelist_append(sys_searchpath, dirbuf, 0);
 #if 0
         if(0) {
           char helppathname[FILENAME_MAX];
@@ -95,8 +103,9 @@ static int libdir_loader(t_canvas *canvas, char *classname)
           sys_helppath = namelist_append(sys_helppath, helppathname, 0);
         }
 #endif
-        logpost(NULL, 3, "libdir_loader: added '%s' to the global objectclass path", 
-                classname);
+        if(libdir_add_to_path(dirbuf, 0))
+          logpost(NULL, 3, "libdir_loader: added '%s' to the global objectclass path",
+                  classname);
 //        post("\tThis is deprecated behavior.");
     }
     /* post("libdir_loader loaded fullclassname: '%s'\n", fullclassname); */
