@@ -147,8 +147,13 @@ static int libdir_loader_pathwise(t_canvas *canvas, const char *classname, const
 
 void libdir_setup(void)
 {
-/* relies on t.grill's loader functionality, fully added in 0.40 */
-    sys_register_loader(libdir_loader_legacy);
+    int major, minor, bugfix;
+    sys_getversion(&major, &minor, &bugfix);
+    if (major>0 || minor >=47) {
+      sys_register_loader(libdir_loader_pathwise);
+    } else {
+      sys_register_loader(libdir_loader_legacy);
+    }
     logpost(NULL, 3, "libdir loader %s",version);
     logpost(NULL, 3, "\tcompiled on "__DATE__" at "__TIME__ " ");
     logpost(NULL, 3, "\tcompiled against Pd version %d.%d.%d.%s",
