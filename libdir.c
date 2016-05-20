@@ -43,6 +43,10 @@ static char *version =
  * to have one directory hold the objects, help files, manuals,
  * etc. making it a self-contained library. <hans@at.or.at>
  */
+static void libdir_get_fullname(char*dest, size_t size, const char*classname) {
+  snprintf(dest, size-1, "%s/%s-meta", classname, classname);
+  dest[size-1]=0;
+}
 
 static int libdir_loader(t_canvas *canvas, char *classname)
 {
@@ -52,11 +56,8 @@ static int libdir_loader(t_canvas *canvas, char *classname)
     t_canvasenvironment *canvasenvironment;
 
 /* look for meta file (classname)/(classname)-meta.pd */
-    strncpy(fullclassname, classname, FILENAME_MAX - 6);
-    strcat(fullclassname, "/");
-    strncat(fullclassname, classname, FILENAME_MAX - strlen(fullclassname) - 6);
-    strcat(fullclassname, "-meta");
-    
+    libdir_get_fullname(fullclassname, FILENAME_MAX, classname);
+
     /* if this is being called from a canvas, then add the library path to the
      * canvas-local path */
     if(canvas)
