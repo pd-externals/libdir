@@ -127,7 +127,6 @@ static int libdir_loader_pathwise(t_canvas *canvas, const char *classname, const
       return 0;
     }
     sys_close(fd);
-    post("libdir:canvas=%p", canvas);
     if(libdir_add_to_path(dirbuf, canvas))
       logpost(NULL, 3, "libdir_loader: added '%s' to the %s objectclass path",
 	      classname, canvas?"canvas-local":"global");
