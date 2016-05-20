@@ -60,12 +60,12 @@ static int libdir_loader(t_canvas *canvas, char *classname)
     
     /* if this is being called from a canvas, then add the library path to the
      * canvas-local path */
-    if(canvas) 
+    if(canvas)
     {
         canvasenvironment = canvas_getenv(canvas);
         /* setting the canvas to NULL causes it to ignore any canvas-local path */
         if ((fd = canvas_open(NULL, fullclassname, ".pd",
-                              dirbuf, &nameptr, FILENAME_MAX, 0)) < 0) 
+                              dirbuf, &nameptr, FILENAME_MAX, 0)) < 0)
         {
             return (0);
         }
@@ -79,7 +79,7 @@ static int libdir_loader(t_canvas *canvas, char *classname)
     else
     {
         if ((fd = open_via_path(".", fullclassname, ".pd",
-                                dirbuf, &nameptr, FILENAME_MAX, 0)) < 0) 
+                                dirbuf, &nameptr, FILENAME_MAX, 0)) < 0)
         {
             return (0);
         }
@@ -104,9 +104,9 @@ void libdir_setup(void)
 {
 /* relies on t.grill's loader functionality, fully added in 0.40 */
     sys_register_loader(libdir_loader);
-    logpost(NULL, 3, "libdir loader %s",version);  
+    logpost(NULL, 3, "libdir loader %s",version);
     logpost(NULL, 3, "\tcompiled on "__DATE__" at "__TIME__ " ");
-    logpost(NULL, 3, "\tcompiled against Pd version %d.%d.%d.%s", 
+    logpost(NULL, 3, "\tcompiled against Pd version %d.%d.%d.%s",
             PD_MAJOR_VERSION, PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
 }
 
