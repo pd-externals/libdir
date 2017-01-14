@@ -137,6 +137,12 @@ static int libdir_loader_pathwise(t_canvas *canvas, const char *classname, const
     return (1);
 }
 
+static t_class *libdir_class;
+static void*libdir_new(void)
+{
+  t_pd *x = pd_new(libdir_class);
+  return (x);
+}
 
 void libdir_setup(void)
 {
@@ -151,6 +157,7 @@ void libdir_setup(void)
     logpost(NULL, 3, "\tcompiled on "__DATE__" at "__TIME__ " ");
     logpost(NULL, 3, "\tcompiled against Pd version %d.%d.%d.%s",
             PD_MAJOR_VERSION, PD_MINOR_VERSION, PD_BUGFIX_VERSION, PD_TEST_VERSION);
+    libdir_class = class_new(gensym("libdir"), libdir_new, 0, sizeof(t_object), CLASS_NOINLET, 0);
 }
 
 void setup(void)
