@@ -51,6 +51,34 @@ static void libdir_get_fullname(char*dest, size_t size, const char*classname) {
   snprintf(dest, size-1, "%s/%s-meta", classname, classname);
   dest[size-1]=0;
 }
+#if PD_MAJOR_VERSION>0 || PD_MINOR_VERSION>47
+/* gone from the headers, but still present for binary compat */
+extern t_namelist *sys_searchpath;
+#endif
+static int libdir_add_to_globalpath(const char*path) {
+    int major, minor, bugfix;
+    sys_getversion(&major, &minor, &bugfix);
+    if((major==0 && minor < 48)) {
+        sys_searchpath = namelist_append(sys_searchpath, path, 0);
+    } else {
+        const char *inptr = path;
+        char encoded[MAXPDSTRING];
+        char *outptr = encoded;
+        t_atom ap[2];
+        *outptr++='+';
+        while(inptr && ((outptr+2) < (encoded+MAXPDSTRING))) {
+            *outptr++ = *inptr++;
+            if ('+'==inptr[-1])
+                 *outptr++='+';
+        }
+        *outptr=0;
+        SETSYMBOL(ap+0, gensym(encoded));
+        SETFLOAT(ap+1, 0.f);
+        pd_typedmess(gensym("pd")->s_thing, gensym("add-to-path"), 2, ap);
+    }
+    return 1;
+}
+
 static int libdir_add_to_path(const char*dirbuf, t_canvas*canvas) {
   if(sys_isabsolutepath(dirbuf)) { // only include actual full paths
     if (canvas) {
@@ -58,7 +86,7 @@ static int libdir_add_to_path(const char*dirbuf, t_canvas*canvas) {
       canvasenvironment->ce_path = namelist_append(canvasenvironment->ce_path,
 						 dirbuf, 0);
     } else {
-        sys_searchpath = namelist_append(sys_searchpath, dirbuf, 0);
+      return libdir_add_to_globalpath(dirbuf);
     }
     return 1;
   }
