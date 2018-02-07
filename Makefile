@@ -31,3 +31,9 @@ cflags = -DVERSION='"$(lib.version)"'
 # https://github.com/pure-data/pd-lib-builder
 PDLIBBUILDER_DIR=pd-lib-builder
 include $(PDLIBBUILDER_DIR)/Makefile.pdlibbuilder
+
+# target to update the pd-lib-builder
+.PHONY: pd-lib-builder
+PDLIBBUILDER_VERSION=master
+pd-lib-builder:
+	git subtree pull --prefix pd-lib-builder/ https://github.com/pure-data/pd-lib-builder $(PDLIBBUILDER_VERSION)
