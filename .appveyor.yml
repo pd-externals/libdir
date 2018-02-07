@@ -19,6 +19,7 @@ before_build:
   - set PATH=C:\MinGW\bin;%PATH%
   - set CC=gcc
 build_script:
+  - mingw32-make PDDIR="Pd" pdbinpath="Pd/bin" vars
   - mingw32-make PDDIR="Pd" pdbinpath="Pd/bin"
 
 test_script:
